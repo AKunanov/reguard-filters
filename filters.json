@@ -1,0 +1,27 @@
+{
+  "converter": {
+    "repository": "https://github.com/AdguardTeam/SafariConverterLib.git",
+    "tag": "v4.3.1"
+  },
+  "safariVersions": ["15", "16.4", "26"],
+  "blockers": {
+    "ads": {
+      "minRules": 20000,
+      "lists": [
+        { "id": 2, "title": "AdGuard Base filter", "url": "https://filters.adtidy.org/ios/filters/2_optimized.txt" },
+        { "id": 1, "title": "AdGuard Russian filter", "url": "https://filters.adtidy.org/ios/filters/1_optimized.txt" },
+        { "id": 11, "title": "AdGuard Mobile Ads filter", "url": "https://filters.adtidy.org/ios/filters/11_optimized.txt" }
+      ]
+    },
+    "annoyances": {
+      "minRules": 5000,
+      "lists": [
+        { "id": 18, "title": "AdGuard Cookie Notices filter", "url": "https://filters.adtidy.org/ios/filters/18_optimized.txt" },
+        { "id": 19, "title": "AdGuard Popups filter", "url": "https://filters.adtidy.org/ios/filters/19_optimized.txt" },
+        { "id": 20, "title": "AdGuard Mobile App Banners filter", "url": "https://filters.adtidy.org/ios/filters/20_optimized.txt" },
+        { "id": 21, "title": "AdGuard Other Annoyances filter", "url": "https://filters.adtidy.org/ios/filters/21_optimized.txt" },
+        { "id": 22, "title": "AdGuard Widgets filter", "url": "https://filters.adtidy.org/ios/filters/22_optimized.txt" }
+      ]
+    }
+  }
+}

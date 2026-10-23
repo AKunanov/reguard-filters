@@ -1,0 +1,42 @@
+name: Build rules
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-rules
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read converter version
+        id: converter
+        run: echo "tag=$(python3 -c 'import json; print(json.load(open("filters.json"))["converter"]["tag"])')" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: converter
+          key: converter-${{ steps.converter.outputs.tag }}-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Build ConverterTool
+        run: python3 build.py converter
+
+      - name: Build rules
+        run: python3 build.py rules
+
+      # Rule files go up before the manifest that points at them; the app checks sha256 anyway.
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view latest > /dev/null 2>&1 || gh release create latest --title "Latest rules" --notes "Rebuilt daily from the lists in filters.json."
+          gh release upload latest dist/*.deflate --clobber
+          gh release upload latest dist/manifest.json --clobber
