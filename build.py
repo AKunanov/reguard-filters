@@ -101,10 +101,13 @@ def build_rules():
                 texts.append(text)
                 manifest["lists"].append({
                     "blocker": blocker,
-                    "id": entry["id"],
                     "title": entry["title"],
+                    "homepage": entry["homepage"],
+                    "authors": entry["authors"],
+                    "license": entry["license"],
+                    "licenseURL": entry["licenseURL"],
                     "version": header.get("Version"),
-                    "updated": header.get("TimeUpdated")
+                    "updated": header.get("Last modified") or header.get("TimeUpdated")
                 })
             rules_path = work / f"{blocker}.txt"
             rules_path.write_text("\n".join(texts) + "\n")

@@ -1,19 +1,19 @@
 # reguard-filters
 
-Safari content blocker rules for the reguard app, rebuilt every day from public filter lists.
+Safari content blocker rules for the reguard app, rebuilt every day from community filter lists.
 
-| Blocker | Lists |
-|---|---|
-| `ads` | AdGuard Base (includes EasyList), AdGuard Russian, AdGuard Mobile Ads |
-| `annoyances` | AdGuard Cookie Notices, Popups, Mobile App Banners, Other Annoyances, Widgets |
+| Blocker | List | Authors | License |
+|---|---|---|---|
+| `ads` | [EasyList](https://easylist.to/) | The EasyList authors | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) (EasyList is dual-licensed; this project uses it under CC BY-SA 3.0) |
+| `annoyances` | [Fanboy's Annoyance List](https://easylist.to/) (includes the EasyList Cookie List and Fanboy's Social, Notifications and Mobile Notifications lists) | The EasyList authors | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
 
-The iOS-optimized versions of the lists are converted with AdGuard's [SafariConverterLib](https://github.com/AdguardTeam/SafariConverterLib) (version pinned in `filters.json`) for three Safari feature levels: 15, 16.4 and 26.
+The lists are converted with AdGuard's [SafariConverterLib](https://github.com/AdguardTeam/SafariConverterLib) (version pinned in `filters.json`) for three Safari feature levels: 15, 16.4 and 26.
 
 ## Output
 
 The [`latest` release](../../releases/tag/latest) holds:
 
-- `manifest.json`: when the rules were built, list versions, and for each file its blocker, Safari version, rule count and the SHA-256 of the uncompressed JSON;
+- `manifest.json`: when the rules were built, the lists they came from with their authors and licenses, and for each file its blocker, Safari version, rule count and the SHA-256 of the uncompressed JSON;
 - `<blocker>-<safari>.json.deflate`: the rule JSON compressed with raw DEFLATE (`COMPRESSION_ZLIB` in Apple's Compression framework).
 
 A build that downloads a broken list, produces too few rules, exceeds Safari's 150,000-rule limit, or produces rules WebKit refuses to compile (`verify.swift`) fails without publishing.
@@ -28,4 +28,4 @@ swift verify.swift dist      # compiles each file with WebKit
 
 ## Licenses
 
-The rules are derived from [AdGuard filters](https://github.com/AdguardTeam/AdguardFilters) (GPL-3.0), which in turn include [EasyList](https://easylist.to). Credit for the lists goes to their authors.
+The published rule files are adaptations of the lists above: the same rules, converted to Safari's content blocker format. The `ads` files are licensed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) and the `annoyances` files under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), with credit to the EasyList authors (https://easylist.to/). The converter only runs in this repository's build; it is not part of the published files.
