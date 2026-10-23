@@ -32,6 +32,9 @@ jobs:
       - name: Build rules
         run: python3 build.py rules
 
+      - name: Check that WebKit accepts the rules
+        run: swift verify.swift dist
+
       # Rule files go up before the manifest that points at them; the app checks sha256 anyway.
       - name: Publish
         env:
