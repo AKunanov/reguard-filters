@@ -2,6 +2,8 @@
 
 Safari content blocker rules for the reguard app, rebuilt every day from community filter lists.
 
+The app's [privacy policy](docs/privacy-policy.md) and [support page](docs/support.md) live here too.
+
 | Blocker | List | Authors | License |
 |---|---|---|---|
 | `ads` | [EasyList](https://easylist.to/) | The EasyList authors | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) (EasyList is dual-licensed; this project uses it under CC BY-SA 3.0) |
