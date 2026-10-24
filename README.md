@@ -18,13 +18,15 @@ The [`latest` release](../../releases/tag/latest) holds:
 - `manifest.json`: when the rules were built, the lists they came from with their authors and licenses, and for each file its blocker, Safari version, rule count and the SHA-256 of the uncompressed JSON;
 - `<blocker>-<safari>.json.deflate`: the rule JSON compressed with raw DEFLATE (`COMPRESSION_ZLIB` in Apple's Compression framework).
 
+Hiding selectors WebKit can't parse (extended syntax such as `:remove-class()` or `:matches-path()`) are dropped one by one (`selectors.swift`): left in, a single one makes Safari drop the whole rule it sits in, with every other selector in it.
+
 A build that downloads a broken list, produces too few rules, exceeds Safari's 150,000-rule limit, or produces rules WebKit refuses to compile (`verify.swift`) fails without publishing.
 
 ## Building locally
 
 ```sh
 python3 build.py converter   # needs Swift
-python3 build.py rules       # writes dist/
+python3 build.py rules       # writes dist/ (needs Swift and WebKit, so macOS)
 swift verify.swift dist      # compiles each file with WebKit
 ```
 

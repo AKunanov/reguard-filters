@@ -5,8 +5,10 @@
     python3 build.py rules       # download the lists and write ./dist
 
 dist/ gets one raw-DEFLATE file per blocker and Safari version, plus manifest.json describing them.
-The build fails instead of publishing anything suspicious: a list that didn't download, a blocker
-with too few rules, or more rules than Safari accepts.
+Hiding selectors WebKit can't parse are dropped one by one (selectors.swift); left in, one of them
+would make Safari drop the whole rule it sits in. The build fails instead of publishing anything
+suspicious: a list that didn't download, a blocker with too few rules, or more rules than Safari
+accepts.
 """
 
 import datetime
@@ -62,6 +64,10 @@ def convert(rules_path, safari_version, output_path):
     return output_path.read_bytes()
 
 
+def drop_unparsable_selectors(paths):
+    subprocess.run(["swift", str(ROOT / "selectors.swift"), *map(str, paths)], check=True)
+
+
 def validate(blocker, safari_version, data, min_rules):
     rules = json.loads(data)
     if not isinstance(rules, list) or not all("trigger" in rule and "action" in rule for rule in rules):
@@ -94,6 +100,7 @@ def build_rules():
 
     with tempfile.TemporaryDirectory() as work:
         work = pathlib.Path(work)
+        converted = []
         for blocker, settings in CONFIG["blockers"].items():
             texts = []
             for entry in settings["lists"]:
@@ -113,20 +120,27 @@ def build_rules():
             rules_path.write_text("\n".join(texts) + "\n")
 
             for safari_version in CONFIG["safariVersions"]:
-                data = convert(rules_path, safari_version, work / f"{blocker}-{safari_version}.json")
-                count = validate(blocker, safari_version, data, settings["minRules"])
-                name = f"{blocker}-{safari_version}.json.deflate"
-                packed = deflate(data)
-                (DIST / name).write_bytes(packed)
-                manifest["files"].append({
-                    "blocker": blocker,
-                    "safari": safari_version,
-                    "name": name,
-                    "rules": count,
-                    "sha256": hashlib.sha256(data).hexdigest(),
-                    "bytes": len(packed)
-                })
-                print(f"{name}: {count} rules, {len(packed) / 1e6:.2f} MB")
+                output_path = work / f"{blocker}-{safari_version}.json"
+                convert(rules_path, safari_version, output_path)
+                converted.append((blocker, settings, safari_version, output_path))
+
+        drop_unparsable_selectors(path for *_, path in converted)
+
+        for blocker, settings, safari_version, output_path in converted:
+            data = output_path.read_bytes()
+            count = validate(blocker, safari_version, data, settings["minRules"])
+            name = f"{blocker}-{safari_version}.json.deflate"
+            packed = deflate(data)
+            (DIST / name).write_bytes(packed)
+            manifest["files"].append({
+                "blocker": blocker,
+                "safari": safari_version,
+                "name": name,
+                "rules": count,
+                "sha256": hashlib.sha256(data).hexdigest(),
+                "bytes": len(packed)
+            })
+            print(f"{name}: {count} rules, {len(packed) / 1e6:.2f} MB")
 
     (DIST / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 
