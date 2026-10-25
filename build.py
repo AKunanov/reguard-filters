@@ -7,8 +7,8 @@
 dist/ gets one raw-DEFLATE file per blocker and Safari version, plus manifest.json describing them.
 Hiding selectors WebKit can't parse are dropped one by one (selectors.swift); left in, one of them
 would make Safari drop the whole rule it sits in. The build fails instead of publishing anything
-suspicious: a list that didn't download, a blocker with too few rules, or more rules than Safari
-accepts.
+suspicious: a list that didn't download, a blocker with too few rules, more rules than Safari
+accepts, or a kind of rule the app won't install.
 """
 
 import datetime
@@ -29,6 +29,11 @@ CONVERTER_BINARY = CONVERTER_SOURCE / ".build" / "release" / "ConverterTool"
 DIST = ROOT / "dist"
 
 SAFARI_RULE_LIMIT = 150000
+# The app adds one rule of its own, for the sites the user switched protection off for.
+RULE_LIMIT = SAFARI_RULE_LIMIT - 1
+# The only kinds of rule the app installs (RulesUpdater.swift); Safari also takes ones that redirect
+# requests or change their headers.
+ALLOWED_ACTIONS = {"block", "block-cookies", "css-display-none", "ignore-previous-rules", "make-https"}
 
 
 def build_converter():
@@ -72,8 +77,11 @@ def validate(blocker, safari_version, data, min_rules):
     rules = json.loads(data)
     if not isinstance(rules, list) or not all("trigger" in rule and "action" in rule for rule in rules):
         raise SystemExit(f"{blocker} for Safari {safari_version}: not a content blocker rule list")
-    if not min_rules <= len(rules) <= SAFARI_RULE_LIMIT:
-        raise SystemExit(f"{blocker} for Safari {safari_version}: {len(rules)} rules is outside {min_rules}..{SAFARI_RULE_LIMIT}")
+    if not min_rules <= len(rules) <= RULE_LIMIT:
+        raise SystemExit(f"{blocker} for Safari {safari_version}: {len(rules)} rules is outside {min_rules}..{RULE_LIMIT}")
+    actions = {rule["action"].get("type") for rule in rules}
+    if not actions <= ALLOWED_ACTIONS:
+        raise SystemExit(f"{blocker} for Safari {safari_version}: rules of a kind the app won't install: {sorted(map(str, actions - ALLOWED_ACTIONS))}")
     return len(rules)
 
 

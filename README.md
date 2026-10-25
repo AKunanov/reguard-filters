@@ -20,7 +20,7 @@ The [`latest` release](../../releases/tag/latest) holds:
 
 Hiding selectors WebKit can't parse (extended syntax such as `:remove-class()` or `:matches-path()`) are dropped one by one (`selectors.swift`): left in, a single one makes Safari drop the whole rule it sits in, with every other selector in it.
 
-A build that downloads a broken list, produces too few rules, exceeds Safari's 150,000-rule limit, or produces rules WebKit refuses to compile (`verify.swift`) fails without publishing.
+A build that downloads a broken list, produces too few rules, exceeds Safari's 150,000-rule limit (less the one rule the app adds), produces a kind of rule the app doesn't install (redirects, header changes), or produces rules WebKit refuses to compile (`verify.swift`) fails without publishing.
 
 ## Building locally
 
